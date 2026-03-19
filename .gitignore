@@ -1,11 +1,20 @@
-# Root monorepo ignores
-MERN_TASKMANAGER/backend/node_modules/
-MERN_TASKMANAGER/frontend/node_modules/
-MERN_TASKMANAGER/backend/.env*
-MERN_TASKMANAGER/frontend/build/
-MERN_TASKMANAGER/frontend/.env*
-**/*.log
-.vscode/
+@"
+node_modules/
+**/node_modules/
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+**/.env
+**/.env.production
+**/.env.local
+build/
+dist/
+*.log
+npm-debug.log*
 .DS_Store
 Thumbs.db
-
+.vscode/
+coverage/
+"@ | Set-Content .gitignore
