@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -193,6 +193,12 @@ export default function Login() {
                 </>
               ) : 'Sign in →'}
             </button>
+
+            <div style={{ textAlign: 'center', marginTop: 12 }}>
+              <Link to="/forgot-password" style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                Forgot password?
+              </Link>
+            </div>
           </form>
         </div>
 

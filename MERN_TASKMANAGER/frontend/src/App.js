@@ -3,8 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 
 export default function App() {
@@ -12,8 +14,14 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login"    element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* Public landing page */}
+          <Route path="/"          element={<Landing />} />
+          <Route path="/home"      element={<Landing />} />
+          <Route path="/login"     element={<Login />} />
+          <Route path="/register"  element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+
+          {/* Protected dashboard */}
           <Route
             path="/dashboard"
             element={
@@ -22,9 +30,12 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+
       <Toaster
         position="top-right"
         gutter={10}
@@ -36,16 +47,12 @@ export default function App() {
             border: '1px solid rgba(79,142,247,0.2)',
             borderRadius: '10px',
             fontSize: '14px',
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
             padding: '12px 16px',
             boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
           },
-          success: {
-            iconTheme: { primary: '#10b981', secondary: '#131d35' },
-          },
-          error: {
-            iconTheme: { primary: '#ef4444', secondary: '#131d35' },
-          },
+          success: { iconTheme: { primary: '#10b981', secondary: '#131d35' } },
+          error:   { iconTheme: { primary: '#ef4444', secondary: '#131d35' } },
         }}
       />
     </AuthProvider>

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /home
+Allow: /login
+Allow: /register
+
+# Block private routes from indexing
+Disallow: /dashboard
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://project-mern-ruddy.vercel.app/sitemap.xml
