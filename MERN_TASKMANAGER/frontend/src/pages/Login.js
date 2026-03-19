@@ -1,207 +1,208 @@
-import React, { useState } from 'react';
-import API from '../api';
+import React, { useState, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
-const Login = () => {
-  const [form, setForm] = useState({ identifier: '', password: '' });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+export default function Login() {
   const { login } = useAuth();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const [form,    setForm]    = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState('');
+  const [focused, setFocused] = useState('');
+  const [showPw,  setShowPw]  = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setError('');
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.email || !form.password) { setError('Please fill in all fields'); return; }
     setLoading(true);
-    setError('');
-    
     try {
-      const res = await API.post('/auth/login', form);
-      login(res.data.token);
-      navigate('/');
+      await login(form.email, form.password);
+      toast.success('Welcome back! 👋');
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials and try again.');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const inputStyle = {
+  const fieldStyle = (name) => ({
     width: '100%',
-    padding: '12px 16px',
-    fontSize: '14px',
-    border: '1px solid #e2e8f0',
-    borderRadius: '6px',
-    backgroundColor: '#f8fafc',
-    transition: 'all 0.2s',
-    outline: 'none',
-    boxSizing: 'border-box',
-    height: '44px', 
-    marginBottom: '4px',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-  };
-
-  const labelStyle = {
-    display: 'block',
-    fontSize: '14px',
-    fontWeight: '500',
-    color: '#4a5568',
-    marginBottom: '8px'
-  };
-
-  const inputContainerStyle = {
-    marginBottom: '20px' // Consistent spacing between form groups
-  };
+    padding: '13px 16px',
+    paddingRight: name === 'password' ? '48px' : '16px',
+    background: focused === name ? 'rgba(79,142,247,0.06)' : 'rgba(255,255,255,0.03)',
+    border: `1.5px solid ${focused === name ? 'rgba(79,142,247,0.5)' : 'rgba(79,142,247,0.12)'}`,
+    borderRadius: '12px',
+    color: '#eef2ff',
+    fontSize: '15px',
+    fontFamily: 'var(--font)',
+    transition: 'all 220ms cubic-bezier(0.4,0,0.2,1)',
+    boxShadow: focused === name ? '0 0 0 4px rgba(79,142,247,0.1), inset 0 1px 2px rgba(0,0,0,0.2)' : 'inset 0 1px 2px rgba(0,0,0,0.2)',
+  });
 
   return (
     <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'url("https://source.unsplash.com/random/1920x1080") no-repeat center center fixed',
-      backgroundSize: 'cover',
-      fontFamily: "'Inter', sans-serif"
+      minHeight: '100vh', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden',
     }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '420px',
-        background: 'rgba(255, 255, 255, 0.9)',
-        borderRadius: '12px',
-        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
-        padding: '40px',
-        margin: '20px'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h2 style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            color: '#2d3748',
-            marginBottom: '8px'
-          }}>Welcome Back</h2>
-          <p style={{
-            fontSize: '14px',
-            color: '#718096',
-            margin: 0
-          }}>Login with your username or email</p>
-        </div>
+      <div className="auth-orb-1" />
+      <div className="auth-orb-2" />
+      <div className="auth-orb-3" />
 
-        {error && (
+      <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
+
+        {/* Logo */}
+        <div className="anim-fade-up" style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{
-            backgroundColor: '#fee2e2',
-            color: '#dc2626',
-            padding: '12px',
-            borderRadius: '6px',
-            marginBottom: '20px',
-            fontSize: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
-            <svg style={{ flexShrink: 0 }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div style={inputContainerStyle}>
-            <label style={labelStyle}>Username or Email</label>
-            <input
-              type="text"
-              value={form.identifier}
-              onChange={(e) => setForm({ ...form, identifier: e.target.value })}
-              required
-              style={inputStyle}
-              placeholder="Enter username or email"
-              autoComplete="username"
-            />
-          </div>
-
-          <div style={inputContainerStyle}>
-            <label style={labelStyle}>Password</label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-              style={inputStyle}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '14px',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#fff',
-              backgroundColor: '#4f46e5',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              opacity: loading ? 0.8 : 1,
-              height: '44px',
-              userSelect: 'none'
-            }}
-            onMouseEnter={e => !loading && (e.currentTarget.style.backgroundColor = '#4338ca')}
-            onMouseLeave={e => !loading && (e.currentTarget.style.backgroundColor = '#4f46e5')}
-          >
-            {loading ? (
-              <>
-                <svg style={{ animation: 'spin 1s linear infinite' }} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-                </svg>
-                Logging in...
-              </>
-            ) : 'Login'}
-          </button>
-        </form>
-
-        <div style={{
-          textAlign: 'center',
-          marginTop: '24px',
-          fontSize: '14px',
-          color: '#64748b'
-        }}>
-          Don't have an account?{' '}
-          <Link to="/register" style={{
-            color: '#4f46e5',
-            fontWeight: '600',
-            textDecoration: 'none',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
-          onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
-          >
-            Sign up
-          </Link>
+            width: 60, height: 60, margin: '0 auto 20px',
+            background: 'linear-gradient(135deg, #4f8ef7, #7c3aed)',
+            borderRadius: '18px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 24, boxShadow: '0 12px 40px rgba(79,142,247,0.4), 0 0 0 1px rgba(79,142,247,0.2)',
+            animation: 'float 6s ease-in-out infinite',
+          }}>✦</div>
+          <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', color: '#eef2ff' }}>
+            Welcome back
+          </h1>
+          <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginTop: 8 }}>
+            Sign in to your <span className="gradient-text">TaskFlow</span> account
+          </p>
         </div>
 
-      {/* Inline spinner animation keyframes */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg);}
-            100% { transform: rotate(360deg);}
-          }
-        `}
-      </style>
+        {/* Card */}
+        <div className="anim-fade-up anim-d2" style={{
+          background: 'rgba(12,18,32,0.8)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(79,142,247,0.14)',
+          borderRadius: '24px',
+          padding: '36px 32px',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+          position: 'relative', overflow: 'hidden',
+        }}>
+          {/* Card shimmer line */}
+          <div style={{
+            position: 'absolute', top: 0, left: '10%', right: '10%', height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(79,142,247,0.4), transparent)',
+          }} />
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {error && (
+              <div className="anim-scale-in" style={{
+                padding: '12px 16px',
+                background: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.25)',
+                borderRadius: '10px',
+                color: '#fca5a5',
+                fontSize: '13.5px',
+                display: 'flex', alignItems: 'center', gap: 8,
+              }}>
+                <span>⚠</span> {error}
+              </div>
+            )}
+
+            {/* Email field */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                Email address
+              </label>
+              <input
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+                autoComplete="email"
+                style={fieldStyle('email')}
+                onFocus={() => setFocused('email')}
+                onBlur={() => setFocused('')}
+              />
+            </div>
+
+            {/* Password field */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                Password
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  name="password"
+                  type={showPw ? 'text' : 'password'}
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  style={fieldStyle('password')}
+                  onFocus={() => setFocused('password')}
+                  onBlur={() => setFocused('')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(v => !v)}
+                  style={{
+                    position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
+                    color: 'var(--text-muted)', fontSize: 16, padding: 4, lineHeight: 1,
+                    transition: 'color var(--t-fast)',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
+                  onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                >
+                  {showPw ? '🙈' : '👁'}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '14px',
+                marginTop: 4,
+                background: loading
+                  ? 'rgba(79,142,247,0.4)'
+                  : 'linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%)',
+                backgroundSize: '200% auto',
+                border: 'none',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '15px',
+                fontWeight: 700,
+                fontFamily: 'var(--font)',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                boxShadow: loading ? 'none' : '0 4px 24px rgba(79,142,247,0.4)',
+                transition: 'all 220ms cubic-bezier(0.4,0,0.2,1)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              }}
+              onMouseEnter={e => { if(!loading) { e.currentTarget.style.transform='translateY(-1px)'; e.currentTarget.style.boxShadow='0 8px 32px rgba(79,142,247,0.5)'; }}}
+              onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 4px 24px rgba(79,142,247,0.4)'; }}
+              onMouseDown={e => { if(!loading) e.currentTarget.style.transform='translateY(1px) scale(0.99)'; }}
+              onMouseUp={e => { e.currentTarget.style.transform='translateY(-1px)'; }}
+            >
+              {loading ? (
+                <>
+                  <div style={{ width:18,height:18,border:'2.5px solid rgba(255,255,255,0.3)',borderTop:'2.5px solid #fff',borderRadius:'50%',animation:'spin 0.6s linear infinite' }} />
+                  Signing in…
+                </>
+              ) : 'Sign in →'}
+            </button>
+          </form>
+        </div>
+
+        <p className="anim-fade-up anim-d3" style={{ textAlign:'center',marginTop:24,fontSize:14,color:'var(--text-muted)' }}>
+          No account?{' '}
+          <Link to="/register" style={{ color:'var(--accent)',fontWeight:600,transition:'color var(--t-fast)' }}>
+            Create one free ↗
+          </Link>
+        </p>
       </div>
     </div>
   );
-};
-
-export default Login;
+}

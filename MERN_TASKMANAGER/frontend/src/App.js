@@ -1,28 +1,53 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/common/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import { useAuth } from './context/AuthContext';
 
-function App() {
-  const { user } = useAuth();
-
+export default function App() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#f8fafc',
-      fontFamily: "'Inter', sans-serif"
-    }}>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login"    element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+      <Toaster
+        position="top-right"
+        gutter={10}
+        toastOptions={{
+          duration: 3500,
+          style: {
+            background: '#131d35',
+            color: '#f0f4ff',
+            border: '1px solid rgba(79,142,247,0.2)',
+            borderRadius: '10px',
+            fontSize: '14px',
+            fontFamily: "'DM Sans', sans-serif",
+            padding: '12px 16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          },
+          success: {
+            iconTheme: { primary: '#10b981', secondary: '#131d35' },
+          },
+          error: {
+            iconTheme: { primary: '#ef4444', secondary: '#131d35' },
+          },
+        }}
+      />
+    </AuthProvider>
   );
 }
-
-export default App;
