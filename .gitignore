@@ -1,0 +1,11 @@
+# Root monorepo ignores
+MERN_TASKMANAGER/backend/node_modules/
+MERN_TASKMANAGER/frontend/node_modules/
+MERN_TASKMANAGER/backend/.env*
+MERN_TASKMANAGER/frontend/build/
+MERN_TASKMANAGER/frontend/.env*
+**/*.log
+.vscode/
+.DS_Store
+Thumbs.db
+
