@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+
 import toast from 'react-hot-toast';
 
 export default function VerifyEmail({ email: propEmail }) {
   const navigate  = useNavigate();
-  const { login: setUser } = useAuth();
+  // auth context available if needed
   const [email]   = useState(propEmail || sessionStorage.getItem('tf_verify_email') || '');
   const [otp,     setOtp]     = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
