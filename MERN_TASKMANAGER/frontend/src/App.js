@@ -3,25 +3,24 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Landing       from './pages/Landing';
+import Login         from './pages/Login';
+import Register      from './pages/Register';
+import VerifyEmail   from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
-import Dashboard from './pages/Dashboard';
+import Dashboard     from './pages/Dashboard';
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public landing page */}
-          <Route path="/"          element={<Landing />} />
-          <Route path="/home"      element={<Landing />} />
-          <Route path="/login"     element={<Login />} />
-          <Route path="/register"  element={<Register />} />
+          <Route path="/"                element={<Landing />} />
+          <Route path="/home"            element={<Landing />} />
+          <Route path="/login"           element={<Login />} />
+          <Route path="/register"        element={<Register />} />
+          <Route path="/verify-email"    element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-
-          {/* Protected dashboard */}
           <Route
             path="/dashboard"
             element={
@@ -30,12 +29,9 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
-
       <Toaster
         position="top-right"
         gutter={10}
